@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'tasks.apps.TasksConfig',
     'gamification.apps.GamificationConfig',
     'dashboard.apps.DashboardConfig',
+    'appointments.apps.AppointmentsConfig',
 
     # Third-party Apps
     'multiselectfield',
