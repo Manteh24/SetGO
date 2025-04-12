@@ -7,6 +7,7 @@ class PlayerProfile(models.Model):
     trainee = models.OneToOneField('accounts.Trainee', on_delete=models.CASCADE, related_name='profile')
     current_xp = models.PositiveIntegerField(default=0)
     level = models.ForeignKey('Level', on_delete=models.SET_NULL, null=True, blank=True)
+    achievements = models.ManyToManyField('Badge', through='PlayerBadge', blank=True)
 
 
 class Level(models.Model):

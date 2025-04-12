@@ -1,3 +1,6 @@
 from django.contrib import admin
+from accounts.models import Trainer, Trainee
 
-# Register your models here.
+
+admin.site.register(Trainer)
+admin.site.register(Trainee)

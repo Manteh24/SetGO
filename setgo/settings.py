@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'dashboard.apps.DashboardConfig',
 
     # Third-party Apps
-    'taggit',
 ]
 
 MIDDLEWARE = [
