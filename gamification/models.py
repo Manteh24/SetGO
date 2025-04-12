@@ -48,4 +48,4 @@ class PlayerBadge(models.Model):
 
 
     def __str__(self):
-        return f"{self.profile.Trainee.user_name} - {self.badge.name}"
+        return f"{self.profile.trainee.user.username} - {self.badge.name}"
