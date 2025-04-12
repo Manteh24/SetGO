@@ -18,22 +18,26 @@ class Trainee(models.Model):
     phone_number = models.CharField(max_length=15, unique=True)
     trainer = models.ForeignKey(Trainer, on_delete=models.SET_NULL, null=True, related_name='trainees')
 
-    DAYS_OF_WEEK = (
+    def __str__(self):
+        return get_full_name_plus_username(self.user)
+
+
+class FixedSession(models.Model):
+    DAY_CHOICES = [
+        ('SA', 'Saturday'),
+        ('SU', 'Sunday'),
         ('MO', 'Monday'),
         ('TU', 'Tuesday'),
         ('WE', 'Wednesday'),
         ('TH', 'Thursday'),
         ('FR', 'Friday'),
-        ('SA', 'Saturday'),
-        ('SU', 'Sunday'),
-    )
+    ]
 
-    fixed_session_days = MultiSelectField(
-        choices=DAYS_OF_WEEK,
-        max_choices=7,
-        max_length=20,
-        blank=True
-    )
+    trainee = models.ForeignKey("Trainee", on_delete=models.CASCADE, related_name='fixed_sessions')
+    day_of_week = models.CharField(max_length=2, choices=DAY_CHOICES)
+    location = models.CharField(max_length=100)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
     def __str__(self):
-        return get_full_name_plus_username(self.user)
+        return f"{self.trainee} - {self.day_of_week} {self.start_time}-{self.end_time}"
