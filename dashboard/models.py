@@ -8,6 +8,7 @@ from gamification.models import PlayerProfile
 
 
 class TrainerDashboard(Trainer):
+
     class Meta:
         proxy = True
 
@@ -16,8 +17,9 @@ class TrainerDashboard(Trainer):
     
     def get_trainee_profile_info(self, trainee):
         profile = getattr(trainee, 'profile', None)
+
         info = {
-            'name': trainee.user.get_full_name(),
+            'name': trainee.user.first_name + ' ' + trainee.user.last_name,
             'phone_number': trainee.phone_number,
         }
 
@@ -79,3 +81,57 @@ class TrainerDashboard(Trainer):
         tomorrow_code = self._weekday_code((date.today() + timedelta(days=1)).weekday())
         sessions = FixedSession.objects.filter(trainee__trainer=self, day_of_week=tomorrow_code)
         return sessions.values('trainee__user__username', 'location', 'start_time', 'end_time')
+    
+
+class TraineeDashboard(Trainee):
+    class Meta:
+        proxy = True
+
+    def get_profile_info(self):
+
+        profile = getattr(self, 'profile', None)
+        info = {
+            'name': f"{self.user.first_name} {self.user.last_name}",
+            'trainer': str(self.trainer) if self.trainer else None,
+            'level': None,
+            'level_name': None,
+            'xp': 0,
+            'badges': [],
+        }
+
+        if profile:
+            level = profile.level
+            info['xp'] = profile.current_xp
+            if level:
+                info['level'] = level.number
+                info['level_name'] = level.name
+            # Using the many-to-many relationship via PlayerProfile.achievements.
+            info['badges'] = list(profile.achievements.values_list('name', flat=True))
+        return info
+
+    def get_assigned_tasks(self):
+
+        return TaskAssignment.objects.filter(trainee=self)
+
+    def mark_task_done(self, task_assignment_id):
+        try:
+            assignment = TaskAssignment.objects.get(id=task_assignment_id, trainee=self)
+            assignment.completed = True
+            assignment.save()
+            return True
+        except TaskAssignment.DoesNotExist:
+            return False
+
+    def send_appointment_request(self, req_date, start_time, end_time, message=None):
+        if not self.trainer:
+            raise ValueError("No trainer associated with this trainee.")
+        appointment = AppointmentRequest.objects.create(
+            trainee=self,
+            trainer=self.trainer,
+            date=req_date,
+            start_time=start_time,
+            end_time=end_time,
+            status='PENDING',
+            message=message,
+        )
+        return appointment
