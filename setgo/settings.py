@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'dashboard.apps.DashboardConfig',
 
     # Third-party Apps
+    'multiselectfield',
 ]
 
 MIDDLEWARE = [
