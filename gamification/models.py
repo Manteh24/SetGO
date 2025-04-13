@@ -1,4 +1,3 @@
-import math
 from django.db import models
 from accounts.models import Trainee
 
@@ -6,7 +5,7 @@ from accounts.models import Trainee
 class PlayerProfile(models.Model):
     trainee = models.OneToOneField('accounts.Trainee', on_delete=models.CASCADE, related_name='profile')
     current_xp = models.PositiveIntegerField(default=0)
-    level = models.ForeignKey('Level', on_delete=models.SET_NULL, null=True, blank=True)
+    level = models.ForeignKey('Level', on_delete=models.PROTECT)
     achievements = models.ManyToManyField('Badge', through='PlayerBadge', blank=True)
 
 

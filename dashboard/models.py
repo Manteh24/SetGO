@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from venv import logger
 from django.db import models
 from django.db.models import Count
 from accounts.models import Trainer, Trainee, FixedSession
@@ -19,23 +20,27 @@ class TrainerDashboard(Trainer):
         profile = getattr(trainee, 'profile', None)
 
         info = {
-            'name': trainee.user.first_name + ' ' + trainee.user.last_name,
+            'name': f"{trainee.user.first_name} {trainee.user.last_name}",
             'phone_number': trainee.phone_number,
+            'current_xp': 0,
+            'level': None,
+            'level_number': None,
+            'badges_count': 0,
         }
 
         if profile:
+            level = profile.level
             info.update({
                 'current_xp': profile.current_xp,
-                'level': profile.level.name if profile.level else None,
+                'level': level.name if level else None,
+                'level_number': level.number if level else None,
                 'badges_count': profile.achievements.count(),
             })
         else:
-            info.update({
-                'current_xp': 0,
-                'level': None,
-                'badges_count': 0,
-            })
-        
+            # Log a warning if the profile is missing
+            logger.warning(f"Trainee {trainee} has no profile associated.")
+
+        # The rest of your information:
         task_counts = (
             TaskAssignment.objects
             .filter(trainee=trainee, completed=True, due_date__lte=date.today())
@@ -51,6 +56,7 @@ class TrainerDashboard(Trainer):
         info['appointment_requests'] = list(appointments.values())
 
         return info
+
 
     def add_extra_xp(self, trainee, xp):
         profile = getattr(trainee, 'profile', None)

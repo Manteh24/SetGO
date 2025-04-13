@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trainer Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ trainer.user.first_name }}!</h1>
+
+    <h2>Your Trainees</h2>
+    <ul>
+        {% for profile in trainee_profiles %}
+            <li>
+                <strong>Name:</strong> {{ profile.name }} <br>
+                <strong>Phone:</strong> {{ profile.phone_number }} <br>
+                <strong>Current XP:</strong> {{ profile.current_xp }} <br>
+                <strong>Level:</strong> 
+                {% if profile.level_number %}
+                    Level {{ profile.level_number }} - {{ profile.level }}
+                {% else %}
+                    Not assigned
+                {% endif %} <br>
+                <strong>Badges Earned:</strong> {{ profile.badges_count }} <br>
+                <strong>Task Counts:</strong>
+                <ul>
+                    {% for task in profile.task_counts %}
+                        <li>Type: {{ task.task__type }}, Count: {{ task.count }}</li>
+                    {% endfor %}
+                </ul>
+                <strong>Fixed Sessions:</strong>
+                <ul>
+                    {% for session in profile.fixed_sessions %}
+                        <li>{{ session.day_of_week }}: {{ session.location }} ({{ session.start_time }} - {{ session.end_time }})</li>
+                    {% endfor %}
+                </ul>
+                <strong>Pending Appointments:</strong>
+                <ul>
+                    {% for app in profile.appointment_requests %}
+                        <li>{{ app }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% empty %}
+            <li>No trainees found.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Today's Sessions</h2>
+    <ul>
+        {% for session in today_sessions %}
+            <li>
+                Trainee: {{ session.trainee__user__username }} |
+                Location: {{ session.location }} |
+                Time: {{ session.start_time }} - {{ session.end_time }}
+            </li>
+        {% empty %}
+            <li>No sessions today.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Tomorrow's Sessions</h2>
+    <ul>
+        {% for session in tomorrow_sessions %}
+            <li>
+                Trainee: {{ session.trainee__user__username }} |
+                Location: {{ session.location }} |
+                Time: {{ session.start_time }} - {{ session.end_time }}
+            </li>
+        {% empty %}
+            <li>No sessions tomorrow.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
