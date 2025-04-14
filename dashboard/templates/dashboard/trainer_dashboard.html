@@ -1,51 +1,70 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="fa">
 <head>
+    <meta charset="UTF-8">
     <title>Trainer Dashboard</title>
+    <link rel="stylesheet" href="{% static 'dashboard/css/trainer_dashboard.css' %}">
 </head>
 <body>
     <h1>Welcome, {{ trainer.user.first_name }}!</h1>
 
     <h2>Your Trainees</h2>
-    <ul>
-        {% for profile in trainee_profiles %}
-            <li>
-                <strong>Name:</strong> {{ profile.name }} <br>
-                <strong>Phone:</strong> {{ profile.phone_number }} <br>
-                <strong>Current XP:</strong> {{ profile.current_xp }} <br>
-                <strong>Level:</strong> 
-                {% if profile.level_number %}
-                    Level {{ profile.level_number }} - {{ profile.level }}
-                {% else %}
-                    Not assigned
-                {% endif %} <br>
-                <strong>Badges Earned:</strong> {{ profile.badges_count }} <br>
-                <strong>Task Counts:</strong>
-                <ul>
-                    {% for task in profile.task_counts %}
-                        <li>Type: {{ task.task__type }}, Count: {{ task.count }}</li>
-                    {% endfor %}
-                </ul>
-                <strong>Fixed Sessions:</strong>
-                <ul>
-                    {% for session in profile.fixed_sessions %}
-                        <li>{{ session.day_of_week }}: {{ session.location }} ({{ session.start_time }} - {{ session.end_time }})</li>
-                    {% endfor %}
-                </ul>
-                <strong>Pending Appointments:</strong>
-                <ul>
-                    {% for app in profile.appointment_requests %}
-                        <li>{{ app }}</li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% empty %}
-            <li>No trainees found.</li>
-        {% endfor %}
-    </ul>
+    <button id="toggleTrainees" class="toggle-button">Show/Hide Trainees</button>
+    <div id="traineeSection" class="trainee-section hidden">
+        {% if trainee_profiles %}
+            {% for profile in trainee_profiles %}
+                <div class="trainee-card">
+                    <h3>{{ profile.name }}</h3>
+                    <div class="section"><strong>Phone:</strong> {{ profile.phone_number }}</div>
+                    <div class="section"><strong>Current XP:</strong> {{ profile.current_xp }}</div>
+                    <div class="section">
+                        <strong>Level:</strong>
+                        {% if profile.level_number %}
+                            Level {{ profile.level_number }} - {{ profile.level }}
+                        {% else %}
+                            Not assigned
+                        {% endif %}
+                    </div>
+                    <div class="section"><strong>Badges Earned:</strong> {{ profile.badges_count }}</div>
+
+                    <div class="section">
+                        <strong>Task Counts:</strong>
+                        <ul>
+                            {% for task in profile.task_counts %}
+                                <li>Type: {{ task.task__type }}, Count: {{ task.count }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="section">
+                        <strong>Fixed Sessions:</strong>
+                        <ul>
+                            {% for session in profile.fixed_sessions %}
+                                <li>{{ session.day_of_week }}: {{ session.location }} ({{ session.start_time }} - {{ session.end_time }})</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    {% if profile.appointment_requests %}
+                        <div class="section">
+                            <strong>Pending Appointments:</strong>
+                            <ul>
+                                {% for app in profile.appointment_requests %}
+                                    <li>{{ app }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="section">No trainees found.</div>
+        {% endif %}
+    </div>
 
     <h2>Today's Sessions</h2>
-    <ul>
+    <ul class="section">
         {% for session in today_sessions %}
             <li>
                 Trainee: {{ session.trainee__user__username }} |
@@ -58,7 +77,7 @@
     </ul>
 
     <h2>Tomorrow's Sessions</h2>
-    <ul>
+    <ul class="section">
         {% for session in tomorrow_sessions %}
             <li>
                 Trainee: {{ session.trainee__user__username }} |
@@ -69,5 +88,14 @@
             <li>No sessions tomorrow.</li>
         {% endfor %}
     </ul>
+
+    <script>
+        const toggleBtn = document.getElementById('toggleTrainees');
+        const section = document.getElementById('traineeSection');
+
+        toggleBtn.addEventListener('click', () => {
+            section.classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>

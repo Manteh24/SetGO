@@ -5,24 +5,21 @@ from dashboard.models import TrainerDashboard
 @login_required
 def trainer_dashboard(request):
     try:
-        # Use the proxy model so that our custom methods are available.
+        # Use the proxy model to obtain our extended Trainer methods.
         trainer = TrainerDashboard.objects.get(user=request.user)
     except TrainerDashboard.DoesNotExist:
-        # In case the logged-in user is not set up as a Trainer.
         return render(request, 'dashboard/error.html', {
             'message': 'Trainer profile not found.'
         })
 
-    # Get trainees and build a list of profile info dictionaries
-    trainees = trainer.get_trainee_list()
-    trainee_profiles = []
-    for trainee in trainees:
-        trainee_profiles.append(trainer.get_trainee_profile_info(trainee))
+    trainee_profiles = trainer.get_trainee_profile_info()
 
     context = {
-        'trainer': trainer,  # You can use this in the template if needed.
+        'trainer': trainer,
         'trainee_profiles': trainee_profiles,
         'today_sessions': trainer.todays_plan(),
         'tomorrow_sessions': trainer.tomorrows_plan(),
+        'pending_appointments': trainer.get_pending_and_approved_appointments(),
+        'approved_appointments': trainer.get_pending_and_approved_appointments(),
     }
     return render(request, 'dashboard/trainer_dashboard.html', context)
