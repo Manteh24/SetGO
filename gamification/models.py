@@ -8,6 +8,8 @@ class PlayerProfile(models.Model):
     level = models.ForeignKey('Level', on_delete=models.PROTECT)
     achievements = models.ManyToManyField('Badge', through='PlayerBadge', blank=True)
 
+    def __str__(self):
+        return f"{self.trainee.user.username} ({self.trainee.user.first_name} {self.trainee.user.last_name})'s Profile"
 
 class Level(models.Model):
     number = models.PositiveIntegerField(unique=True)
